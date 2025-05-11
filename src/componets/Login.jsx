@@ -99,11 +99,11 @@ export default function Login() {
           />
 
           {/* زر تسجيل الدخول */}
-          <Link to="/AdminDashboard">
+       
             <Button  fullWidth   size="large" variant="contained" sx={{fontSize: "20px",mt: 3, py: 1.5}} className='sing' onClick={handleClik}>
             تسجيل الدخول
    </Button>
-  </Link> 
+
         </Box>
       </Paper>
     </Box>
