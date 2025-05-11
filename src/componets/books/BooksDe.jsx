@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import supabase from "../../supabaseClient";
-import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+
 
 export default function BookDetails() {
   const { id } = useParams();

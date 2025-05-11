@@ -41,7 +41,7 @@ function App() {
     <Route path="/Books/Devleopment" element={<Devleopment />} />
     <Route path="/Books/Religious" element={<Religious />} />
     <Route path="/Books/Novels" element={<Novels />} />
-    <Route path="/Books/:id" element={<BooksDe />} />
+    <Route path="/Books/BooksDe" element={<BooksDe />} />
   </Route>
   <Route path="/AdminDashboard">
     <Route index element={<AdminDashboard />} />
