@@ -1,0 +1,50 @@
+body{
+  margin: 0;
+}
+.book:hover{
+background-color: white;
+color:rgb(18, 26, 90);
+transition: 0.3s; 
+box-Shadow: 8;
+transform: translateY(-5px);
+cursor: pointer;
+}
+.cont:hover{
+  background-color:rgb(18, 26, 90) !important;
+  color:white !important; 
+  transition: 0.3s; 
+  box-Shadow: 8;
+  transform: translateY(-5px);
+  cursor: pointer;
+}
+.sings:hover{
+  background-color:rgb(18, 26, 90) !important;
+  color:white !important; 
+  transition: transform 0.3s ease,box-shadow 0.3s ease;  
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+  transform:scale(1.05);
+}
+.sing:hover{
+  background-color: white;
+  color:rgb(18, 26, 90);
+  transition: transform 0.3s ease,box-shadow 0.3s ease;  
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+  transform:scale(1.05);
+}
+
+.exit:hover{
+  transition: transform 0.3s ease,box-shadow 0.3s ease;  
+   box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+   transform:scale(1.05);
+  background-color:red;
+  color:white;
+
+}
+.exits:hover{
+  transition: transform 0.3s ease,box-shadow 0.3s ease;  
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+  transform:scale(1.05);
+ background-color:red !important;
+ color:white !important;}
+
+
