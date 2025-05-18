@@ -1,11 +1,8 @@
-// AdminDashboard.jsx
-
 import { useState, useEffect } from "react";
 import { Grid, Button, Box, Typography, TextField, Select, MenuItem} from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from "react-router-dom";
 import supabase from "../../supabaseClient";
-
 function AdminDashboard() {
   const [Books, setBooks] = useState([]);
   const [pdfFile, setPdfFile] = useState(null);
@@ -65,8 +62,6 @@ try {
 
   const imageUrl = imageUrlData?.publicUrl;
   console.log("رابط الصورة:", imageUrl);
-
-
       // ✅ رفع ملف PDF
       const fileExt = pdfFile.name.split(".").pop();
       const fileName = `${Date.now()}.${fileExt}`;
@@ -146,7 +141,7 @@ try {
         </Grid>
         <Grid item xs={12} md="auto" sx={{ textAlign: "center", ml: 1 }}>
           <Link to="/" style={{ textDecoration: "none" }}>
-            <Button variant="outlined" className="exit" sx={{ color: "white", fontSize: 20 }}>
+            <Button variant="outlined" className="exit" sx={{ color: "white",fontSize: { xs: 16, md: 20 } ,borderColor:"red" }}>
               تسجيل الخروج <LogoutIcon />
             </Button>
           </Link>
@@ -243,14 +238,13 @@ try {
 
       <Box sx={{ mt: 4, display: "flex", justifyContent: "center", gap: 2 }}>
         <Link to="/AdminDashboard/AllBooks" style={{ textDecoration: "none" }}>
-          <Button variant="contained" sx={{ fontSize: "20px" ,mb:5}} style={{ boxShadow:" 0px 8px 12px rgba(0,0,0,0.2)"}} className="book">📚 جميع الكتب</Button>
+          <Button variant="contained" sx={{fontSize: { xs: 16, md: 20 } ,mb:5}} style={{ boxShadow:" 0px 8px 12px rgba(0,0,0,0.2)"}} className="book">📚 جميع الكتب</Button>
         </Link>
         <Link to="BorrowedBook" style={{ textDecoration: "none" }}>
-          <Button sx={{ fontSize: "20px", mb:5}} className="cont" style={{ boxShadow:" 0px 8px 12px rgba(0,0,0,0.2)"}}>📚 الكتب المستعارة</Button>
+          <Button sx={{ fontSize: { xs: 16, md: 20 } , mb:5}} variant="outlined" className="cont" style={{ boxShadow:" 0px 8px 12px rgba(0,0,0,0.2)"}}>📚 الكتب المستعارة</Button>
         </Link>
       </Box>
     </>
   );
 }
-
 export default AdminDashboard;

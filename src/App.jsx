@@ -14,7 +14,6 @@ import Devleopment from './componets/books/Devleopment';
 import Religious from './componets/books/ReligiousAndHistorical';
 import Novels from './componets/books/NovelsAndStories';
 import BooksAll from './componets/books/BooksAll';
-import BooksDe from'./componets/books/BooksDe'
 
 function App() {
 
@@ -41,7 +40,6 @@ function App() {
     <Route path="/Books/Devleopment" element={<Devleopment />} />
     <Route path="/Books/Religious" element={<Religious />} />
     <Route path="/Books/Novels" element={<Novels />} />
-    <Route path="/Books/BooksDe" element={<BooksDe />} />
   </Route>
   <Route path="/AdminDashboard">
     <Route index element={<AdminDashboard />} />

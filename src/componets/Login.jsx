@@ -3,6 +3,7 @@ import { Link ,useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Grid from '@mui/material/Grid';
 import '../App.css'
+
 export default function Login() {
     const admin={
         name:"munaf",
@@ -51,7 +52,7 @@ export default function Login() {
             variant="outlined"
             sx={{
               color: 'white',
-              fontSize: { xs: 16, md: 20 }
+              fontSize: { xs: 16, md: 20 } ,borderColor:"white"
             }}
             className='sing'>
      الصفحة الرئيسية

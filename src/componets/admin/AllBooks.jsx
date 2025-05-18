@@ -1,136 +1,89 @@
 
-import React, { useEffect, useState } from "react";
+import React, {  useState ,useMemo} from "react";
 import supabase from "../../supabaseClient";
 import { Grid, Button, Typography, Card,ButtonGroup, CardContent, Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
-import LogoutIcon from "@mui/icons-material/Logout";
-import { Link } from "react-router-dom";
 import "../../App.css";
-
-export default function AllBooks() {
-  const [books, setBooks] = useState([]);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+import SearchBooks from '../BooksEn/SearchBooks'
+import useBooks from '../BooksEn/UseBooks'
+import PageHeader from '../BooksEn/PageHeader'
+export default function AllBooks() {const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [deleteBookTitle, setDeleteBookTitle] = useState("");
     const [filter, setFilter] = useState("all");
-
-  useEffect(() => {
-    const localData = localStorage.getItem("books");
-    if (localData) {
-      try {
-        setBooks(JSON.parse(localData));
-      } catch (e) {
-        console.error("تعذر قراءة البيانات من localStorage", e);
-      }
-    }
-    const fetchBooks = async () => {
-  const { data, error } = await supabase.from("books").select("*");
-  if (error) {
-    console.error("Error fetching books:", error.message);
-  } else {
-
-const booksWithImages = data.map((book) => {
-  console.log("رابط الصورة في قاعدة البيانات:", book.im); // تحقق من أن المسار موجود
-  if (book.im) {
-    // تأكد من إضافة المسار الصحيح للصورة داخل الـ Bucket
-    const path = `img/${book.im}`;  // تأكد من أن المسار يحتوي على المجلد الصحيح
-    console.log("المسار الذي سيتم استخدامه:", path); // تحقق من المسار الذي سيتم استخدامه
-    const { data: urlData, error } = supabase.storage
-      .from("muntaha")
-      .getPublicUrl(path);
-
-    if (error) {
-      console.error("Error getting public URL:", error.message);
-      book.im = "";
-    } else {
-      book.im = urlData.publicUrl; // احفظ الرابط الفعلي هنا
-    }
-    console.log("الرابط النهائي:", book.im); // تحقق من الرابط النهائي هنا
-  } else {
-    console.log("لا يوجد مسار للصورة في الكتاب، سيتم تعيين القيمة فارغة");
-    book.im = "";
-  }
-  return book;
-});
-setBooks(booksWithImages);
-localStorage.setItem("books", JSON.stringify(booksWithImages));
-
-  }
-};
-    fetchBooks();
-  }, []);
+      const [query, setQuery] = useState("");      // ما يكتبه المستخدم
+  const {  books, handleDownload,  fetchBooks} = useBooks();
 ///hendelers
   const handleDeleteDialogClose = () => {
     setShowDeleteDialog(false);
     setDeleteId(null);
     setDeleteBookTitle("");
   };
-  const handleDeleteConfirm = async () => {
-    if (deleteId) {
-      const { error } = await supabase.from("books").delete().eq("id", deleteId);
-      if (error) {
-        console.error("Error deleting book:", error.message);
-      } else {
-        const updatedBooks = books.filter((book) => book.id !== deleteId);
-        setBooks(updatedBooks);
-        localStorage.setItem("books", JSON.stringify(updatedBooks));
-      }
-      handleDeleteDialogClose();
-    }
-  };
-  //dowlend
-  const handleDownload = async (fileNameOrUrl) => {
-    if (!fileNameOrUrl) {
-      console.error("اسم الملف غير موجود!");
-      return;
-    }
-    const fileName = fileNameOrUrl.split("/").pop();
-    const path = `books/${fileName}`;
-    console.log("تحميل الملف من:", path);
-    const { data, error } = await supabase.storage
+// ـــ حذف كتاب مع ملفّاته ـــ
+const handleDeleteConfirm = async () => {
+  if (!deleteId) return;
+
+  /* 1) اجلب مسارات الملفات من الصفّ */
+  const { data: book, error: fetchErr } = await supabase
+    .from("books")
+    .select("im, pdf")
+    .eq("id", deleteId)
+    .single();
+
+  if (fetchErr) {
+    console.error("خطأ بجلب مسارات الملفات:", fetchErr.message);
+    return;
+  }
+
+  /* 2) كوّن مصفوفة المسارات داخل البكت */
+  const paths = [];
+  if (book.im) paths.push(`img/${book.im}`);                 // صورة الغلاف
+
+  if (book.pdf) {
+    // book.pdf رابط عام → استخرج اسم الملف فقط
+    const pdfName = book.pdf.split("/").pop();               // 
+    paths.push(`books/${pdfName}`);                          // ملف PDF
+  }
+
+  /* 3) احذف الملفات من Bucket */
+  if (paths.length) {
+    const { error: removeErr } = await supabase
+      .storage
       .from("muntaha")
-      .createSignedUrl(path, 60);
-    if (error || !data) {
-      console.error("خطأ في توليد رابط التحميل:", error?.message);
-      return;
+      .remove(paths);
+
+    if (removeErr) {
+      console.error("خطأ حذف الملفات:", removeErr.message);
+      // إذا أردتِ إيقاف حذف الصف عند الفشل فارجعي هنا
+      // return;
     }
-    const link = document.createElement("a");
-    link.href = data.signedUrl;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-  ////filter
- const filteredBooks = books.filter((book) => {
-    if (filter === "borrowed") return book.borrowed;
-    if (filter === "available") return !book.borrowed;
-    return true;
-  });
+  }
+  /* 4) احذف الصف نفسه من جدول books */
+  const { error: rowErr } = await supabase
+    .from("books")
+    .delete()
+    .eq("id", deleteId);
+
+  if (rowErr) console.error("خطأ حذف الصف:", rowErr.message);
+  else await fetchBooks();          // حدّث القائمة بعد الحذف
+  handleDeleteDialogClose();        // أغلق الحوار وأعد الضبط
+};
+
+  /* ترشيح حسب الاستعارة */
+  const statusFiltered = useMemo(() => {
+    if (filter === "borrowed") return books.filter((b) => b.borrowed);
+    if (filter === "available") return books.filter((b) => !b.borrowed);
+    return books;
+  }, [books, filter]);
+
+  /* ترشيح حسب البحث */
+  const filteredBooks = useMemo(() => {
+    return statusFiltered.filter((b) =>
+      b.title.toLowerCase().includes(query.toLowerCase())
+    );
+  }, [statusFiltered, query]);
   return (
     <>
-      
-{/* heder */}
-      <Grid
-        container
-        spacing={2}
-        alignItems="center"
-        justifyContent="space-between"
-        sx={{ p: 2, backgroundColor: "primary.main", color: "white", direction: "rtl" }}
-      >
-        <Grid item xs={12} md="auto">
-          <Typography sx={{ fontSize: { xs: 20, md: 28 }, textAlign: { xs: "center", md: "start" } }}>
-            أيام تسليم واستلام كتب الاستعارة
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md="auto" sx={{ textAlign: "center", ml: 1 }}>
-          <Link to="/AdminDashboard" style={{ textDecoration: "none" }}>
-            <Button variant="outlined" sx={{ color: "white", fontSize: 20 }} className="sing">
-              رجوع <LogoutIcon />
-            </Button>
-          </Link>
-        </Grid>
-      </Grid>
-{/* ==heder== */}
+     <PageHeader title="أيام تسليم واستلام كتب الاستعارة" backTo="/AdminDashboard" />
       <Typography variant="h2" sx={{ textAlign: "center", mt: 3 }}>
         📚 جميع الكتب
       </Typography>
@@ -171,6 +124,16 @@ localStorage.setItem("books", JSON.stringify(booksWithImages));
       </Box>
   {/*== فلترة ==*/}
   {/* عرض الكتب */}
+        {/* شريط البحث + زر البحث */}
+  <SearchBooks query={query} setQuery={setQuery}/>
+      {/* عرض الكتب أو رسالة عدم التوفر */}
+  <Box sx={{ py: 4, textAlign: "center" }}>
+    {filteredBooks.length === 0 ? (
+      /* الرسالة */
+      <Typography variant="h3" sx={{mt:10}} style={{color:"gray"}}>
+        الكتاب غير متوفر
+      </Typography>
+    ) : (
       <Box sx={{ py: 4 }}>
         <Grid container spacing={3} justifyContent="center">
           {filteredBooks.map((book) => (
@@ -186,7 +149,7 @@ localStorage.setItem("books", JSON.stringify(booksWithImages));
               >
                 <CardContent>
                   <Typography variant="h4" sx={{textAlign:"center"}}>{book.title}</Typography>
-                  <Box sx={{ textAlign: "center", mb: 1 }}>
+                  <Box sx={{ textAlign: "center", mb: 1,mt:1}}>
                     <img src={book.im} alt={book.title} style={{ width: "260px", height: "200px", objectFit: "cover"  }} />
 
                   </Box>
@@ -199,16 +162,16 @@ localStorage.setItem("books", JSON.stringify(booksWithImages));
                   <Button
                     variant="outlined"
                     color="primary"
-                    sx={{ mt: 1 }}
+                    sx={{ mt: 1,width:"50%",mr:1 }}
                     onClick={() => handleDownload(book.pdf)}
                     className="sings"
                   >
                     📥 تحميل الكتاب
                   </Button>
                    <Button
-                    variant="contained"
+                    variant="outlined"
                     className="exits"
-                    style={{ color: "red", backgroundColor: "white", fontSize: "18px" }}
+                    style={{ color: "red", backgroundColor: "white", fontSize: "18px",width:"50%",borderColor:"red" }}
                     sx={{ mt: 1 }}
                     onClick={() => {
                       setDeleteId(book.id);
@@ -226,6 +189,7 @@ localStorage.setItem("books", JSON.stringify(booksWithImages));
           ))}
         </Grid>
       </Box>
+    )}</Box>
         {/*== عرض الكتب ==*/}
        {/* نافذة تأكيد الحذف */}
         <Dialog

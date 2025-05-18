@@ -71,7 +71,7 @@ break;
         <Button
             variant="outlined"
             sx={{
-              color: 'white',
+              color: 'white',borderColor:"white",
               fontSize: { xs: 16, md: 20 }
             }}
             className='sing'>
