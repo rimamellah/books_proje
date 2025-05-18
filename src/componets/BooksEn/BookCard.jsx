@@ -12,11 +12,11 @@ const BookCard = ({ book, onBorrowClick, onDownloadClick }) => (
     <CardContent>
       <Typography variant="h4">{book.title}</Typography>
       {book.im && (
-        <Box sx={{ textAlign: "center", mb: 1 ,mt:1}}>
+        <Box sx={{ textAlign: "center", mb: 1 ,mt:1  }} style={{height: "200px",  width: '100%'}}>
           <img
             src={book.im}
             alt={book.title}
-            style={{ width: "260px", height: "200px", objectFit: "cover" }}
+            style={{  display: 'block' ,  width: '100%', height: '100%', objectFit:'contain',objectPosition:'center'}} 
           />
         </Box>
       )}

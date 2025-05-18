@@ -149,8 +149,8 @@ const handleDeleteConfirm = async () => {
               >
                 <CardContent>
                   <Typography variant="h4" sx={{textAlign:"center"}}>{book.title}</Typography>
-                  <Box sx={{ textAlign: "center", mb: 1,mt:1}}>
-                    <img src={book.im} alt={book.title} style={{ width: "260px", height: "200px", objectFit: "cover"  }} />
+                  <Box sx={{ textAlign: "center", mb: 1 ,mt:1  }} style={{height: "200px",  width: '100%'}}>
+                    <img src={book.im} alt={book.title}   style={{  display: 'block' ,  width: '100%', height: '100%', objectFit:'contain',objectPosition:'center'}}  />
 
                   </Box>
                   <Typography variant="body2" sx={{ mb: 1 ,textAlign:"right"}}>{book.description}</Typography>
