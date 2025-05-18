@@ -77,7 +77,7 @@ export default function BorrowDialog({ open, onClose, book, onSaved }) {
                 label="رقم الهاتف"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-                inputProps={{ maxLength: 10 }}
+                inputProps={{ maxLength: 13 }}
                 fullWidth
               />
             </Stack>

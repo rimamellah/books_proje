@@ -1,5 +1,4 @@
 import { Box, ButtonGroup, Button } from "@mui/material";
-
 const BooksFilter = ({ currentFilter, onChange }) => (
   <Box sx={{ textAlign: "center", my: 2 }}>
     <ButtonGroup size="large"style={{ boxShadow: "0px 8px 12px rgba(0,0,0,0.2)" }}>
